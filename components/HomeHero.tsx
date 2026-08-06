@@ -27,9 +27,14 @@ export default function HomeHero() {
       ) : null}
 
       {loggedIn === true ? (
-        <Link href="/learning" className="inline-block bg-orange-500 text-white font-semibold px-8 py-3 rounded-full">
-          🎬 Explore Learning
-        </Link>
+        <div className="flex gap-3 justify-center">
+          <Link href="/dashboard" className="inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-full">
+            📊 Dashboard
+          </Link>
+          <Link href="/learning" className="inline-block border border-white/30 text-white font-semibold px-6 py-3 rounded-full">
+            🎬 Learning
+          </Link>
+        </div>
       ) : null}
     </div>
   );

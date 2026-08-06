@@ -17,6 +17,7 @@ export default function AdminUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -37,6 +38,12 @@ export default function AdminUsersPage() {
     load();
   }
 
+  async function handleDelete(id: string) {
+    await fetch("/api/v1/admin/users/" + id + "/delete", { method: "POST" });
+    setConfirmingDeleteId(null);
+    load();
+  }
+
   return (
     <div>
       <h1 className="text-lg font-bold mb-4">Users</h1>
@@ -50,7 +57,7 @@ export default function AdminUsersPage() {
 
       {loading ? <p className="text-gray-400 text-sm">Loading...</p> : null}
 
-      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-xl overflow-hidden overflow-x-auto">
         <table className="w-full text-sm">
           <thead className="bg-gray-50 text-gray-500 text-xs">
             <tr>
@@ -59,7 +66,7 @@ export default function AdminUsersPage() {
               <th className="text-left px-3 py-2">Role</th>
               <th className="text-left px-3 py-2">Status</th>
               <th className="text-left px-3 py-2">Location</th>
-              <th className="text-left px-3 py-2">Action</th>
+              <th className="text-left px-3 py-2">Actions</th>
             </tr>
           </thead>
           <tbody>
@@ -74,13 +81,27 @@ export default function AdminUsersPage() {
                   </td>
                   <td className="px-3 py-2 text-xs text-gray-400">{user.district}, {user.state}</td>
                   <td className="px-3 py-2">
-                    {user.status === "active" ? (
-                      <button type="button" onClick={() => handleSuspend(user.id)} className="text-xs text-red-600">
-                        Suspend
-                      </button>
-                    ) : (
-                      <span className="text-xs text-gray-400">—</span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {user.status === "active" ? (
+                        <button type="button" onClick={() => handleSuspend(user.id)} className="text-xs text-yellow-600">
+                          Suspend
+                        </button>
+                      ) : null}
+                      {confirmingDeleteId === user.id ? (
+                        <>
+                          <button type="button" onClick={() => handleDelete(user.id)} className="text-xs text-red-600 font-semibold">
+                            Confirm Delete
+                          </button>
+                          <button type="button" onClick={() => setConfirmingDeleteId(null)} className="text-xs text-gray-400">
+                            Cancel
+                          </button>
+                        </>
+                      ) : (
+                        <button type="button" onClick={() => setConfirmingDeleteId(user.id)} className="text-xs text-red-600">
+                          Delete
+                        </button>
+                      )}
+                    </div>
                   </td>
                 </tr>
               );
