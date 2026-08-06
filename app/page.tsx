@@ -1,5 +1,6 @@
 import HomeHero from "@/components/HomeHero";
 import BannerCarousel from "@/components/BannerCarousel";
+import HomeAdSection from "@/components/HomeAdSection";
 import DailyQuoteCard from "@/features/daily-content/components/DailyQuoteCard";
 import DailyLearningCard from "@/features/daily-content/components/DailyLearningCard";
 import FeaturedOpportunitiesCarousel from "@/features/featured-opportunities/components/FeaturedOpportunitiesCarousel";
@@ -11,6 +12,7 @@ export default function HomePage() {
     <div>
       <HomeHero />
       <BannerCarousel />
+      <HomeAdSection />
       <DailyQuoteCard />
       <DailyLearningCard />
       <FeaturedOpportunitiesCarousel />
