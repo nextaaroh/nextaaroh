@@ -11,7 +11,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("marketplace_products")
-    .select("id, title, category, price_paise, status, cover_image_url, is_admin_post, created_at")
+    .select("id, title, category, price_paise, status, cover_image_url, is_admin_post, seller_id, created_at, profiles!marketplace_products_seller_id_fkey(username, full_name)")
     .order("created_at", { ascending: false })
     .limit(100);
 

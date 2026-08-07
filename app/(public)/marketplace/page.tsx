@@ -32,6 +32,7 @@ export default function MarketplacePage() {
     <div>
       <div className="flex items-center justify-between px-4 pt-4">
         <h1 className="text-lg font-bold">Marketplace</h1>
+        <Link href="/marketplace/seller-dashboard" className="text-sm text-gray-500 font-medium mr-3">Dashboard</Link>
         <Link href="/marketplace/sell" className="text-sm text-orange-500 font-medium">
           + Sell
         </Link>

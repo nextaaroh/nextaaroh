@@ -4,6 +4,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import BottomNav from "@/components/layout/BottomNav";
 import SplashScreen from "@/components/SplashScreen";
+import TrafficTracker from "@/components/TrafficTracker";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 
 export const metadata: Metadata = {
@@ -20,6 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="pb-16 md:pb-0">
         <LanguageProvider>
           <SplashScreen />
+          <TrafficTracker />
           <Header />
           <main>{children}</main>
           <Footer />
