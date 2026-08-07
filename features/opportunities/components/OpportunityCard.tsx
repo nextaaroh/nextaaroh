@@ -1,3 +1,5 @@
+"use client";
+
 type Opportunity = {
   id: string;
   title: string;
@@ -16,8 +18,22 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 export default function OpportunityCard({ opportunity }: { opportunity: Opportunity }) {
+  function trackClick() {
+    fetch("/api/v1/track/apply-click", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content_type: "opportunity", content_id: opportunity.id }),
+    }).catch(() => {});
+  }
+
   return (
-    <a href={opportunity.apply_link} target="_blank" rel="noopener noreferrer" className="block border border-gray-200 rounded-xl p-4">
+    <a
+      href={opportunity.apply_link}
+      target="_blank"
+      rel="noopener noreferrer"
+      onClick={trackClick}
+      className="block border border-gray-200 rounded-xl p-4"
+    >
       <div className="flex items-start justify-between mb-1">
         <p className="font-medium text-sm">{opportunity.title}</p>
         <span className="text-[10px] bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full shrink-0 ml-2">

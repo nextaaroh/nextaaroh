@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 
 type Video = {
   id: string;
@@ -27,6 +27,34 @@ export default function VideoCard({ video }: { video: Video }) {
   const [playing, setPlaying] = useState(false);
   const { rating, count } = getFakeRating(video.id);
   const videoId = extractYoutubeId(video.youtube_url);
+  const startTimeRef = useRef<number | null>(null);
+
+  function sendWatchSession() {
+    if (!startTimeRef.current) return;
+    const seconds = Math.round((Date.now() - startTimeRef.current) / 1000);
+    startTimeRef.current = null;
+    if (seconds < 3) return;
+    const payload = JSON.stringify({ video_id: video.id, seconds_watched: seconds });
+    const blob = new Blob([payload], { type: "application/json" });
+    navigator.sendBeacon("/api/v1/learning/watch-session", blob);
+  }
+
+  function handlePlay() {
+    setPlaying(true);
+    startTimeRef.current = Date.now();
+  }
+
+  useEffect(() => {
+    function handleVisibilityChange() {
+      if (document.visibilityState === "hidden") sendWatchSession();
+    }
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      sendWatchSession();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="border-b border-gray-100 pb-4">
@@ -39,7 +67,7 @@ export default function VideoCard({ video }: { video: Video }) {
             allowFullScreen
           />
         ) : (
-          <button type="button" onClick={() => setPlaying(true)} className="absolute inset-0 w-full h-full">
+          <button type="button" onClick={handlePlay} className="absolute inset-0 w-full h-full">
             <img src={video.thumbnail_url} alt={video.title} className="w-full h-full object-cover" />
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="w-12 h-12 rounded-full bg-black/60 flex items-center justify-center">

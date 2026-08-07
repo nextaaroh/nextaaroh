@@ -6,6 +6,7 @@ const NAV_ITEMS = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/analytics", label: "Analytics" },
   { href: "/admin/marketplace/pending", label: "Marketplace Approvals" },
+  { href: "/admin/marketplace/all", label: "All Products" },
   { href: "/admin/opportunities/pending", label: "Opportunity Approvals" },
   { href: "/admin/learning", label: "Learning Videos" },
   { href: "/admin/reports", label: "Reports" },

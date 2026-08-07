@@ -1,19 +1,20 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type WalletData = {
   points_balance: number;
   wallet_balance_paise: number;
 };
 
-const POINTS_PER_CONVERSION = 100;
+const COINS_PER_CONVERSION = 100;
 const RUPEES_PER_CONVERSION = 5;
 
 export default function WalletSection() {
   const [wallet, setWallet] = useState<WalletData>({ points_balance: 0, wallet_balance_paise: 0 });
   const [showConvert, setShowConvert] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
-  const [convertPoints, setConvertPoints] = useState("");
+  const [convertCoins, setConvertCoins] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [withdrawMethod, setWithdrawMethod] = useState("upi");
   const [withdrawDestination, setWithdrawDestination] = useState("");
@@ -35,19 +36,19 @@ export default function WalletSection() {
   }, []);
 
   const walletRupees = (wallet.wallet_balance_paise / 100).toFixed(2);
-  const convertRupees = convertPoints
-    ? ((Number(convertPoints) / POINTS_PER_CONVERSION) * RUPEES_PER_CONVERSION).toFixed(2)
+  const convertRupees = convertCoins
+    ? ((Number(convertCoins) / COINS_PER_CONVERSION) * RUPEES_PER_CONVERSION).toFixed(2)
     : "0.00";
 
   async function handleConvert() {
     setMessage("");
-    const pointsNum = Number(convertPoints);
-    if (!pointsNum || pointsNum < POINTS_PER_CONVERSION || pointsNum % POINTS_PER_CONVERSION !== 0) {
-      setMessage("Points " + POINTS_PER_CONVERSION + " के multiple में डालें (जैसे 100, 200, 300)");
+    const coinsNum = Number(convertCoins);
+    if (!coinsNum || coinsNum < COINS_PER_CONVERSION || coinsNum % COINS_PER_CONVERSION !== 0) {
+      setMessage("Coins " + COINS_PER_CONVERSION + " के multiple में डालें (जैसे 100, 200, 300)");
       return;
     }
-    if (pointsNum > wallet.points_balance) {
-      setMessage("इतने points आपके पास नहीं हैं");
+    if (coinsNum > wallet.points_balance) {
+      setMessage("इतने Aaroh Coins आपके पास नहीं हैं");
       return;
     }
     setSubmitting(true);
@@ -55,11 +56,11 @@ export default function WalletSection() {
       const res = await fetch("/api/v1/points/convert-to-wallet", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ points: pointsNum }),
+        body: JSON.stringify({ points: coinsNum }),
       });
       if (res.ok) {
         setMessage("Convert हो गया!");
-        setConvertPoints("");
+        setConvertCoins("");
       } else {
         setMessage("कुछ गलत हो गया, फिर कोशिश करें");
       }
@@ -74,6 +75,15 @@ export default function WalletSection() {
     setMessage("");
     if (!withdrawAmount || !withdrawDestination) {
       setMessage("Amount और account/UPI details भरना ज़रूरी है");
+      return;
+    }
+    const amountNum = Number(withdrawAmount);
+    if (amountNum < 129) {
+      setMessage("कम से कम ₹129 withdraw कर सकते हैं");
+      return;
+    }
+    if (amountNum > 1500) {
+      setMessage("एक बार में ज़्यादा से ज़्यादा ₹1500 तक ही withdraw कर सकते हैं");
       return;
     }
     setSubmitting(true);
@@ -104,11 +114,14 @@ export default function WalletSection() {
   return (
     <div className="border border-gray-200 rounded-xl overflow-hidden">
       <div className="bg-gradient-to-br from-[#0a1a3a] to-[#132a5c] text-white p-4">
-        <p className="text-xs text-white/60 mb-3">My Wallet</p>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs text-white/60">My Wallet</p>
+          <Link href="/coins-history" className="text-xs text-orange-400">History →</Link>
+        </div>
         <div className="flex gap-3">
           <div className="flex-1 bg-white/10 rounded-lg p-3 text-center">
-            <p className="text-xl font-bold text-orange-400">{wallet.points_balance}</p>
-            <p className="text-xs text-white/60">Points</p>
+            <p className="text-xl font-bold text-orange-400">🪙 {wallet.points_balance}</p>
+            <p className="text-xs text-white/60">Aaroh Coins</p>
           </div>
           <div className="flex-1 bg-white/10 rounded-lg p-3 text-center">
             <p className="text-xl font-bold text-green-400">₹{walletRupees}</p>
@@ -127,7 +140,7 @@ export default function WalletSection() {
           }}
           className="flex-1 py-3 text-sm font-medium text-orange-600"
         >
-          🔄 Convert Points
+          🔄 Convert Coins
         </button>
         <button
           type="button"
@@ -145,16 +158,16 @@ export default function WalletSection() {
       {showConvert ? (
         <div className="p-4 space-y-3">
           <p className="text-xs text-gray-500">
-            {POINTS_PER_CONVERSION} Points = ₹{RUPEES_PER_CONVERSION} — सिर्फ {POINTS_PER_CONVERSION} के multiple में convert कर सकते हैं
+            {COINS_PER_CONVERSION} Aaroh Coins = ₹{RUPEES_PER_CONVERSION} — सिर्फ {COINS_PER_CONVERSION} के multiple में convert कर सकते हैं
           </p>
           <input
             className="input"
             type="number"
-            placeholder="कितने points convert करने हैं"
-            value={convertPoints}
-            onChange={(e) => setConvertPoints(e.target.value)}
+            placeholder="कितने coins convert करने हैं"
+            value={convertCoins}
+            onChange={(e) => setConvertCoins(e.target.value)}
           />
-          {convertPoints ? <p className="text-sm text-green-600">मिलेंगे: ₹{convertRupees}</p> : null}
+          {convertCoins ? <p className="text-sm text-green-600">मिलेंगे: ₹{convertRupees}</p> : null}
           <button
             type="button"
             onClick={handleConvert}
@@ -169,7 +182,7 @@ export default function WalletSection() {
       {showWithdraw ? (
         <div className="p-4 space-y-3">
           <div>
-            <label className="text-sm font-medium block mb-1">Amount (₹)</label>
+            <label className="text-sm font-medium block mb-1">Amount (₹129 - ₹1500)</label>
             <input className="input" type="number" value={withdrawAmount} onChange={(e) => setWithdrawAmount(e.target.value)} />
           </div>
           <div>

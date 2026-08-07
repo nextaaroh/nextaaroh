@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const { title, description, category, price_paise, originality_declared, file_path } = body;
+  const { title, description, category, price_paise, originality_declared, file_path, cover_image_url } = body;
 
   if (!title || !description || !category || !originality_declared || !file_path) {
     return NextResponse.json({ error: { code: "validation_error", message: "सारी ज़रूरी fields भरें" } }, { status: 400 });
@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
     description,
     category,
     price_paise: price_paise ?? 0,
+    cover_image_url: cover_image_url ?? null,
     file_url: file_path,
     file_sha256: "sha-pending-" + Date.now(),
     originality_declared: true,

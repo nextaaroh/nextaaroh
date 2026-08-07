@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { containsContactInfo } from "@/lib/moderation/contactInfoFilter";
 import { createClient } from "@/lib/supabase/client";
+import { uploadToImgbb } from "@/lib/imgbb/uploadImage";
 
 const CATEGORY_OPTIONS = [
   { value: "previous_year_questions", label: "Previous Year Questions (PYQ)" },
@@ -23,6 +24,8 @@ export default function SellForm() {
   const [pricingType, setPricingType] = useState("free");
   const [price, setPrice] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
+  const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [originalityChecked, setOriginalityChecked] = useState(false);
   const [rightsChecked, setRightsChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -32,6 +35,15 @@ export default function SellForm() {
   const isEbook = category === "ebooks";
   const isPaid = pricingType === "paid";
   const descriptionHasContactInfo = containsContactInfo(description) || containsContactInfo(title);
+
+  function handleCoverChange(selectedFile: File | null) {
+    setCoverFile(selectedFile);
+    if (selectedFile) {
+      setCoverPreview(URL.createObjectURL(selectedFile));
+    } else {
+      setCoverPreview(null);
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -96,6 +108,12 @@ export default function SellForm() {
         return;
       }
 
+      let coverImageUrl: string | null = null;
+      if (coverFile) {
+        setUploadProgress("Cover image upload हो रही है...");
+        coverImageUrl = await uploadToImgbb(coverFile);
+      }
+
       setUploadProgress("Listing submit हो रही है...");
       const finalPricePaise = isPaid ? Math.round(Number(price) * 100) : 0;
       const res = await fetch("/api/v1/marketplace/products", {
@@ -108,6 +126,7 @@ export default function SellForm() {
           price_paise: finalPricePaise,
           originality_declared: true,
           file_path: filePath,
+          cover_image_url: coverImageUrl,
         }),
       });
 
@@ -124,6 +143,8 @@ export default function SellForm() {
       setDescription("");
       setPrice("");
       setFile(null);
+      setCoverFile(null);
+      setCoverPreview(null);
       setPricingType("free");
       setOriginalityChecked(false);
       setRightsChecked(false);
@@ -181,6 +202,17 @@ export default function SellForm() {
           <input className="input" type="number" min="1" value={price} onChange={(e) => setPrice(e.target.value)} placeholder="जैसे: 49" />
         </div>
       ) : null}
+
+      <div>
+        <label className="text-sm font-medium block mb-1">Cover Image (landscape, optional)</label>
+        {coverPreview ? (
+          <div className="w-full aspect-video rounded-lg overflow-hidden bg-gray-100 mb-2">
+            <img src={coverPreview} alt="Cover preview" className="w-full h-full object-cover" />
+          </div>
+        ) : null}
+        <input type="file" accept="image/*" onChange={(e) => handleCoverChange(e.target.files?.[0] ?? null)} className="input" />
+        <p className="text-xs text-gray-400 mt-1">Landscape (चौड़ी) image अच्छी दिखती है — जैसे 1280×720</p>
+      </div>
 
       <div>
         <label className="text-sm font-medium block mb-1">PDF Upload</label>

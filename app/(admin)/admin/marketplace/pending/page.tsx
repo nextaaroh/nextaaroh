@@ -13,15 +13,24 @@ type Product = {
 export default function AdminMarketplacePendingPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
   const [rejectingId, setRejectingId] = useState<string | null>(null);
   const [reason, setReason] = useState("");
 
   const load = useCallback(() => {
     setLoading(true);
+    setFetchError("");
     fetch("/api/v1/admin/marketplace/pending")
-      .then((res) => (res.ok ? res.json() : { data: [] }))
-      .then((data) => setProducts(data?.data ?? []))
-      .catch(() => setProducts([]))
+      .then(async (res) => {
+        const data = await res.json();
+        if (!res.ok) {
+          setFetchError(data.error?.message ?? "कुछ गलत हो गया");
+          setProducts([]);
+          return;
+        }
+        setProducts(data?.data ?? []);
+      })
+      .catch(() => setFetchError("Network error"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -50,7 +59,8 @@ export default function AdminMarketplacePendingPage() {
       <h1 className="text-lg font-bold mb-4">Marketplace Approvals</h1>
 
       {loading ? <p className="text-gray-400 text-sm">Loading...</p> : null}
-      {!loading && products.length === 0 ? <p className="text-gray-400 text-sm">कोई pending listing नहीं है 🎉</p> : null}
+      {fetchError ? <p className="text-red-600 text-sm">Error: {fetchError}</p> : null}
+      {!loading && !fetchError && products.length === 0 ? <p className="text-gray-400 text-sm">कोई pending listing नहीं है 🎉</p> : null}
 
       <div className="space-y-3">
         {products.map((product) => {

@@ -1,5 +1,7 @@
 import HomeHero from "@/components/HomeHero";
 import BannerCarousel from "@/components/BannerCarousel";
+import ContinueLearning from "@/components/ContinueLearning";
+import AiCoachBanner from "@/components/AiCoachBanner";
 import HomeAdSection from "@/components/HomeAdSection";
 import DailyQuoteCard from "@/features/daily-content/components/DailyQuoteCard";
 import DailyLearningCard from "@/features/daily-content/components/DailyLearningCard";
@@ -12,6 +14,8 @@ export default function HomePage() {
     <div>
       <HomeHero />
       <BannerCarousel />
+      <ContinueLearning />
+      <AiCoachBanner />
       <HomeAdSection />
       <DailyQuoteCard />
       <DailyLearningCard />

@@ -1,12 +1,12 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, PlayCircle, Users, PhoneCall, ShoppingBag, User } from "lucide-react";
+import { Home, PlayCircle, Sparkles, PhoneCall, ShoppingBag, User } from "lucide-react";
 
 const items = [
   { href: "/", label: "Home", icon: Home },
   { href: "/learning", label: "Learning", icon: PlayCircle },
-  { href: "/community", label: "Community", icon: Users },
+  { href: "/ai-coach", label: "AI Coach", icon: Sparkles },
   { href: "/call-and-earn", label: "Call & Earn", icon: PhoneCall },
   { href: "/marketplace", label: "Market", icon: ShoppingBag },
   { href: "/me", label: "Profile", icon: User },

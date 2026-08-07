@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth/requireAdmin";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
 
 function slugify(text: string) {
   return text.trim().toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-") + "-" + Date.now().toString(36);
@@ -13,17 +12,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: { code: "forbidden", message: "Admin access ज़रूरी है" } }, { status: 403 });
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-
   const body = await req.json();
-  const { title, description, category, price_paise, cover_image_url, file_url } = body;
+  const { title, description, category, price_paise, cover_image_url, file_path } = body;
 
-  if (!title || !description || !category) {
-    return NextResponse.json({ error: { code: "validation_error", message: "Title, description, category ज़रूरी हैं" } }, { status: 400 });
+  if (!title || !description || !category || !file_path) {
+    return NextResponse.json({ error: { code: "validation_error", message: "Title, description, category, PDF ज़रूरी हैं" } }, { status: 400 });
   }
 
   const admin = createAdminClient();
+  const { data: { user } } = await (await import("@/lib/supabase/server")).createClient().then((c) => c.auth.getUser());
+
   const { error } = await admin.from("marketplace_products").insert({
     seller_id: user!.id,
     title,
@@ -32,7 +30,7 @@ export async function POST(req: NextRequest) {
     category,
     price_paise: price_paise ?? 0,
     cover_image_url: cover_image_url ?? null,
-    file_url: file_url ?? "pending-upload",
+    file_url: file_path,
     file_sha256: "admin-post-" + Date.now(),
     originality_declared: true,
     status: "published",
