@@ -49,7 +49,7 @@ export default function AdminMarketplacePostPage() {
 
       setProgress("PDF upload हो रही है...");
       const safeName = pdfFile.name.replace(/[^a-zA-Z0-9.-]/g, "_");
-      const filePath = "admin/" + Date.now() + "-" + safeName;
+      const filePath = user.id + "/admin-" + Date.now() + "-" + safeName;
       const { error: uploadError } = await supabase.storage.from("marketplace-files").upload(filePath, pdfFile, {
         contentType: "application/pdf",
       });

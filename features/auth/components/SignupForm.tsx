@@ -109,6 +109,7 @@ export default function SignupForm() {
         setSubmitting(false);
         return;
       }
+      if (data.educator_welcome) alert(data.educator_welcome);
       window.location.href = "/dashboard";
     } catch {
       setServerError(t("signup.network_error"));

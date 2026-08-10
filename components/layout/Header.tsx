@@ -2,11 +2,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 export default function Header() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/v1/me")
@@ -15,10 +15,13 @@ export default function Header() {
         if (data) {
           setLoggedIn(true);
           setPhotoUrl(data.photo_url ?? null);
+          setRole(data.role ?? null);
         }
       })
       .catch(() => {});
   }, []);
+
+  const isEducatorOrAdmin = role === "educator" || role === "admin" || role === "super_admin";
 
   return (
     <header className="sticky top-0 z-50 flex items-center justify-between px-4 py-3 bg-[#0a1a3a] text-white gap-2">
@@ -28,9 +31,12 @@ export default function Header() {
           Next<span className="text-orange-500">Aaroh</span>
         </span>
       </Link>
-      <div className="flex items-center gap-3">
-        <LanguageSwitcher />
-        <Link href="/me" className="flex items-center gap-1.5 text-sm whitespace-nowrap">
+      <div className="flex items-center gap-3 text-xs">
+        <Link href="/blog">Blog</Link>
+        <Link href="/scholarships">Scholarships</Link>
+        <Link href="/meetings">Meetings</Link>
+        {isEducatorOrAdmin ? <Link href="/educator-dashboard" className="text-orange-400">Educator</Link> : null}
+        <Link href="/me" className="flex items-center gap-1.5">
           {loggedIn && photoUrl ? (
             <img src={photoUrl} alt="Profile" className="w-7 h-7 rounded-full object-cover ring-1 ring-white/30" />
           ) : loggedIn ? (

@@ -7,7 +7,6 @@ type Post = {
   excerpt: string | null;
   cover_image_url: string | null;
   category: string | null;
-  published_at: string | null;
 };
 
 export default function BlogPostCard({ post }: { post: Post }) {
@@ -22,9 +21,7 @@ export default function BlogPostCard({ post }: { post: Post }) {
           )}
         </div>
         <div className="flex-1 min-w-0">
-          {post.category ? (
-            <span className="text-[10px] font-medium text-orange-500 uppercase">{post.category}</span>
-          ) : null}
+          {post.category ? <span className="text-[10px] font-medium text-orange-500 uppercase">{post.category}</span> : null}
           <p className="font-medium text-sm line-clamp-2 mt-0.5">{post.title}</p>
           {post.excerpt ? <p className="text-xs text-gray-500 line-clamp-2 mt-1">{post.excerpt}</p> : null}
         </div>

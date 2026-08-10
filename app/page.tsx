@@ -1,5 +1,6 @@
 import HomeHero from "@/components/HomeHero";
 import BannerCarousel from "@/components/BannerCarousel";
+import QuickLinksGrid from "@/components/QuickLinksGrid";
 import ContinueLearning from "@/components/ContinueLearning";
 import AiCoachBanner from "@/components/AiCoachBanner";
 import HomeAdSection from "@/components/HomeAdSection";
@@ -8,12 +9,15 @@ import DailyLearningCard from "@/features/daily-content/components/DailyLearning
 import FeaturedOpportunitiesCarousel from "@/features/featured-opportunities/components/FeaturedOpportunitiesCarousel";
 import TopWebsitesList from "@/features/daily-content/components/TopWebsitesList";
 import DreamWallPreview from "@/features/dream-wall/components/DreamWallPreview";
+import SocialChannels from "@/features/social/components/SocialChannels";
+import HelpWidget from "@/features/ai-coach/components/HelpWidget";
 
 export default function HomePage() {
   return (
     <div>
       <HomeHero />
       <BannerCarousel />
+      <QuickLinksGrid />
       <ContinueLearning />
       <AiCoachBanner />
       <HomeAdSection />
@@ -22,6 +26,8 @@ export default function HomePage() {
       <FeaturedOpportunitiesCarousel />
       <TopWebsitesList />
       <DreamWallPreview />
+      <SocialChannels />
+      <HelpWidget />
     </div>
   );
 }

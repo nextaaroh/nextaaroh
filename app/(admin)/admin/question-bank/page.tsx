@@ -14,6 +14,8 @@ export default function AdminQuestionBankPage() {
   const [message, setMessage] = useState("");
   const [genMessage, setGenMessage] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [aiGenerating, setAiGenerating] = useState(false);
+  const [aiMessage, setAiMessage] = useState("");
 
   const load = useCallback(() => {
     fetch("/api/v1/admin/question-bank")
@@ -78,6 +80,22 @@ export default function AdminQuestionBankPage() {
     }
   }
 
+  async function handleAiGenerate() {
+    setAiMessage("");
+    setAiGenerating(true);
+    try {
+      const res = await fetch("/api/v1/admin/quiz/generate-ai-daily", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok) {
+        setAiMessage(data.error?.message ?? "कुछ गलत हो गया");
+        return;
+      }
+      setAiMessage(data.message ?? "Done");
+    } finally {
+      setAiGenerating(false);
+    }
+  }
+
   return (
     <div>
       <h1 className="text-lg font-bold mb-1">Question Bank</h1>
@@ -86,6 +104,12 @@ export default function AdminQuestionBankPage() {
       <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6 max-w-md">
         <p className="text-sm font-medium mb-2">आज के 3 Quiz अभी Generate करें</p>
         <p className="text-xs text-gray-500 mb-3">Bank में कम से कम 30 questions होने चाहिए। Deployment के बाद यह अपने आप रोज़ चलेगा (cron job से) — अभी manual button है testing के लिए।</p>
+
+        <button type="button" onClick={handleAiGenerate} disabled={aiGenerating} className="bg-purple-600 text-white text-sm font-medium px-4 py-2 rounded-lg mb-2 disabled:opacity-50">
+          {aiGenerating ? "Generating..." : "✨ AI से आज का 5-Question Quiz बनाएं"}
+        </button>
+        {aiMessage ? <p className="text-xs mb-2 text-gray-700">{aiMessage}</p> : null}
+
         <button type="button" onClick={handleGenerate} disabled={generating} className="bg-orange-500 text-white text-sm font-medium px-4 py-2 rounded-lg disabled:opacity-50">
           {generating ? "Generating..." : "Generate आज के Quiz"}
         </button>

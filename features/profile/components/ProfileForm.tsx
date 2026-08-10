@@ -4,6 +4,7 @@ import Link from "next/link";
 import WalletSection from "./WalletSection";
 import GamificationCard from "@/features/gamification/components/GamificationCard";
 import { uploadToImgbb } from "@/lib/imgbb/uploadImage";
+import LanguageSwitcher from "@/components/LanguageSwitcher";
 
 type Certificate = { id: string; title: string; issuer: string | null; issue_date: string | null };
 type Project = { id: string; title: string; description: string | null; project_url: string | null };
@@ -340,6 +341,8 @@ export default function ProfileForm() {
       </Link>
 
       <div className="border-t border-gray-200 pt-4">
+        <p className="text-xs font-semibold text-gray-400 uppercase mb-2">Language</p>
+        <div className="mb-4"><LanguageSwitcher /></div>
         <p className="text-xs font-semibold text-gray-400 uppercase mb-2">NextAaroh Settings</p>
         <div className="border border-gray-200 rounded-xl divide-y divide-gray-100 overflow-hidden">
           <Link href="/dashboard" className="flex items-center justify-between px-4 py-3 text-sm">

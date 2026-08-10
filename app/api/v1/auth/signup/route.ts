@@ -62,6 +62,8 @@ export async function POST(req: NextRequest) {
     if (referrer) referrerId = referrer.id;
   }
 
+  const { data: educatorMatch } = await admin.from("educator_directory").select("educator_title, full_name, claimed").eq("mobile_number", data.mobile_number).maybeSingle();
+
   const { error: profileError } = await admin.from("profiles").insert({
     id: authUser.user.id,
     username: data.username,
@@ -81,11 +83,17 @@ export async function POST(req: NextRequest) {
     guardian_mobile_number: data.guardian_mobile_number ?? null,
     guardian_consent_given_at: isMinor ? new Date().toISOString() : null,
     status: "active",
+    role: educatorMatch ? "educator" : "student",
+    educator_title: educatorMatch?.educator_title ?? null,
   });
 
   if (profileError) {
     await admin.auth.admin.deleteUser(authUser.user.id);
     return NextResponse.json({ error: { code: "profile_failed", message: profileError.message } }, { status: 400 });
+  }
+
+  if (educatorMatch && !educatorMatch.claimed) {
+    await admin.from("educator_directory").update({ claimed: true, claimed_by: authUser.user.id }).eq("mobile_number", data.mobile_number);
   }
 
   await awardPoints(authUser.user.id, "signup", 50, "Signup bonus");
@@ -101,5 +109,8 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
   await supabase.auth.signInWithPassword({ email: authEmail, password: data.password });
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({
+    success: true,
+    educator_welcome: educatorMatch ? "You're " + educatorMatch.educator_title + "! 🎉" : null,
+  });
 }

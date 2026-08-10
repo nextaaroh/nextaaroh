@@ -26,22 +26,22 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
     return NextResponse.json({ error: { code: "already_attempted", message: "आप यह quiz पहले खेल चुके हैं" } }, { status: 400 });
   }
 
-  const { data: questions } = await admin.from("quiz_questions").select("id, correct_option_id, points_value").eq("quiz_id", quiz.id);
+  const { data: questions } = await admin.from("quiz_questions").select("id, correct_option_id").eq("quiz_id", quiz.id);
 
   let correctCount = 0;
-  let score = 0;
+  let coinsEarned = 0;
   for (const answer of answers) {
     const question = questions?.find((q) => q.id === answer.question_id);
     if (question && question.correct_option_id === answer.selected_option_id) {
       correctCount++;
-      score += question.points_value ?? 2;
+      coinsEarned += Math.floor(Math.random() * 11) + 10;
     }
   }
 
   await admin.from("quiz_attempts").insert({
     quiz_id: quiz.id,
     profile_id: user.id,
-    score,
+    score: coinsEarned,
     correct_count: correctCount,
     total_questions: questions?.length ?? 0,
     submitted_at: new Date().toISOString(),
@@ -49,9 +49,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ slu
   });
 
   await awardPoints(user.id, "quiz_participation", 10, "Quiz attempted: " + slug);
-  if (correctCount > 0) {
-    await awardPoints(user.id, "quiz_correct_answer", correctCount * 2, correctCount + " correct answers");
+  if (coinsEarned > 0) {
+    await awardPoints(user.id, "quiz_correct_answer", coinsEarned, correctCount + " correct answers");
   }
 
-  return NextResponse.json({ score, correct_count: correctCount, total_questions: questions?.length ?? 0 });
+  return NextResponse.json({ score: coinsEarned, correct_count: correctCount, total_questions: questions?.length ?? 0 });
 }
