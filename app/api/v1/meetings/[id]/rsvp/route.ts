@@ -1,0 +1,18 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: { code: "unauthorized", message: "पहले login करें" } }, { status: 401 });
+  }
+
+  const { error } = await supabase.from("meeting_rsvps").upsert({ meeting_id: id, profile_id: user.id });
+  if (error) {
+    return NextResponse.json({ error: { code: "insert_failed", message: error.message } }, { status: 400 });
+  }
+  return NextResponse.json({ success: true });
+}

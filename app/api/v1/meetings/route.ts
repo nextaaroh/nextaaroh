@@ -5,7 +5,7 @@ export async function GET() {
   const admin = createAdminClient();
   const { data, error } = await admin
     .from("meetings")
-    .select("id, title, description, scheduled_at")
+    .select("id, title, description, scheduled_at, cover_image_url")
     .gte("scheduled_at", new Date().toISOString())
     .order("scheduled_at", { ascending: true });
 

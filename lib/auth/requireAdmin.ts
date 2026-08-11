@@ -9,8 +9,9 @@ export async function requireAdmin() {
   }
 
   const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+  const allowed = ["admin", "super_admin", "moderator", "manager"];
 
-  if (!profile || (profile.role !== "admin" && profile.role !== "super_admin" && profile.role !== "moderator")) {
+  if (!profile || !allowed.includes(profile.role)) {
     return { authorized: false, reason: "not_admin" as const, profile: null };
   }
 

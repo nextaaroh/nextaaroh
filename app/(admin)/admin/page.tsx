@@ -24,6 +24,7 @@ const QUICK_LINKS = [
   { href: "/admin/learning", label: "Learning Videos", emoji: "🎬" },
   { href: "/admin/quiz", label: "Quiz Manager", emoji: "📝" },
   { href: "/admin/question-bank", label: "Question Bank", emoji: "🗂️" },
+  { href: "/admin/website-requests", label: "Website Requests", emoji: "🌐" },
   { href: "/admin/reports", label: "Reports", emoji: "🚩" },
   { href: "/admin/users", label: "Users", emoji: "👥" },
 ];

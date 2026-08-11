@@ -1,6 +1,9 @@
 import HomeHero from "@/components/HomeHero";
 import BannerCarousel from "@/components/BannerCarousel";
 import QuickLinksGrid from "@/components/QuickLinksGrid";
+import SessionBanner from "@/components/SessionBanner";
+import ChatManagerCard from "@/components/ChatManagerCard";
+import WebsiteServiceBanner from "@/components/WebsiteServiceBanner";
 import ContinueLearning from "@/components/ContinueLearning";
 import AiCoachBanner from "@/components/AiCoachBanner";
 import HomeAdSection from "@/components/HomeAdSection";
@@ -18,6 +21,9 @@ export default function HomePage() {
       <HomeHero />
       <BannerCarousel />
       <QuickLinksGrid />
+      <SessionBanner />
+      <ChatManagerCard />
+      <WebsiteServiceBanner />
       <ContinueLearning />
       <AiCoachBanner />
       <HomeAdSection />
