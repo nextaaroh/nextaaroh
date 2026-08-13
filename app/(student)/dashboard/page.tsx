@@ -26,7 +26,7 @@ export default function DashboardPage() {
   return (
     <div>
       <h1 className="text-lg font-bold px-4 pt-4">Dashboard</h1>
-      <PointsBadge points={data.points_balance} streak={data.current_streak_days} />
+      <PointsBadge points={data.points_balance ?? 0} streak={data.current_streak_days ?? 0} />
       <QuickActions />
       <DailyQuoteCard />
       <DailyLearningCard />

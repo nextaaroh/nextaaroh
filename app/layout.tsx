@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   description: "Learn digital skills, use AI effectively, and start freelancing with NextAaroh. Build practical skills for career growth, jobs and entrepreneurship.",
   manifest: "/manifest.json",
   themeColor: "#0a1a3a",
+  viewport: "width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no",
   other: {
     "google-adsense-account": "ca-pub-9090589506290519",
   },

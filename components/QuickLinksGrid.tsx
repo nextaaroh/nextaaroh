@@ -4,12 +4,13 @@ const LINKS = [
   { href: "/blog", label: "Blog", emoji: "📰" },
   { href: "/scholarships", label: "Scholarships", emoji: "🎓" },
   { href: "/workplace", label: "Workplace", emoji: "💼" },
+  { href: "/website-service", label: "Get Website", emoji: "🌐" },
 ];
 
 export default function QuickLinksGrid() {
   return (
     <div className="px-4 my-4">
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {LINKS.map((link) => {
           return (
             <Link key={link.href} href={link.href} className="flex flex-col items-center gap-1 bg-white border border-gray-200 rounded-xl py-3">
