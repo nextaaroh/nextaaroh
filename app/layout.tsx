@@ -6,6 +6,7 @@ import BottomNav from "@/components/layout/BottomNav";
 import SplashScreen from "@/components/SplashScreen";
 import TrafficTracker from "@/components/TrafficTracker";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { Analytics } from "@vercel/analytics/next";
 import { LanguageProvider } from "@/lib/i18n/LanguageContext";
 import { InstallProvider } from "@/lib/pwa/InstallContext";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <Footer />
             <BottomNav />
             <ServiceWorkerRegister />
+            <Analytics />
           </LanguageProvider>
         </InstallProvider>
       </body>
