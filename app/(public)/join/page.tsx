@@ -1,8 +1,9 @@
 "use client";
-import { useEffect } from "react";
+
+import { Suspense, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function JoinPage() {
+function JoinContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const ref = searchParams.get("ref");
@@ -10,6 +11,7 @@ export default function JoinPage() {
   useEffect(() => {
     if (ref) {
       localStorage.setItem("creator_ref", ref);
+
       fetch("/api/v1/creator-club/track-click", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -20,5 +22,23 @@ export default function JoinPage() {
     }
   }, [ref, router]);
 
-  return <div className="max-w-md mx-auto p-4 text-sm text-gray-500 text-center mt-10">Redirecting...</div>;
+  return (
+    <div className="max-w-md mx-auto p-4 text-sm text-gray-500 text-center mt-10">
+      Redirecting...
+    </div>
+  );
+}
+
+export default function JoinPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-md mx-auto p-4 text-sm text-gray-500 text-center mt-10">
+          Redirecting...
+        </div>
+      }
+    >
+      <JoinContent />
+    </Suspense>
+  );
 }
