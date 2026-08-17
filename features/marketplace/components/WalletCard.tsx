@@ -2,11 +2,13 @@
 import { useEffect, useState } from "react";
 
 type WalletData = {
+  tracked_paise?: number;
+  pending_paise?: number;
   balance_paise: number;
 };
 
 export default function WalletCard() {
-  const [wallet, setWallet] = useState<WalletData>({ balance_paise: 0 });
+  const [wallet, setWallet] = useState<WalletData>({ balance_paise: 0, tracked_paise: 0, pending_paise: 0 });
   const [amount, setAmount] = useState("");
   const [method, setMethod] = useState("upi");
   const [destination, setDestination] = useState("");
@@ -14,7 +16,7 @@ export default function WalletCard() {
   const [message, setMessage] = useState("");
 
   useEffect(() => {
-    fetch("/api/v1/marketplace/seller/dashboard")
+    fetch("/api/v1/me/wallet-summary")
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data) setWallet(data);
@@ -54,13 +56,15 @@ export default function WalletCard() {
     }
   }
 
-  const balanceRupees = (wallet.balance_paise / 100).toFixed(0);
+  const balanceRupees = ((wallet.tracked_paise ?? wallet.balance_paise) / 100).toFixed(0);
+  const pendingRupees = ((wallet.pending_paise ?? 0) / 100).toFixed(0);
 
   return (
     <div className="max-w-md mx-auto p-4">
       <div className="bg-gradient-to-br from-[#0a1a3a] to-[#132a5c] text-white rounded-xl p-5 text-center mb-4">
         <p className="text-xs text-white/60 mb-1">Wallet Balance</p>
         <p className="text-3xl font-bold">₹{balanceRupees}</p>
+        {Number(pendingRupees) > 0 ? <p className="text-xs text-yellow-300 mt-1">+ ₹{pendingRupees} Pending</p> : null}
       </div>
 
       <h2 className="text-sm font-semibold mb-2">Withdraw</h2>

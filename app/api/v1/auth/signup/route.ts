@@ -98,6 +98,14 @@ export async function POST(req: NextRequest) {
 
   await awardPoints(authUser.user.id, "signup", 50, "Signup bonus");
 
+  const creatorRef = body.creator_ref;
+  if (creatorRef) {
+    const { data: creatorLink } = await admin.from("creator_links").select("id").eq("ref_code", creatorRef).maybeSingle();
+    if (creatorLink) {
+      await admin.from("creator_signups").insert({ creator_link_id: creatorLink.id, new_user_id: authUser.user.id });
+    }
+  }
+
   if (referrerId) {
     await admin.from("referrals").insert({
       referrer_id: referrerId,

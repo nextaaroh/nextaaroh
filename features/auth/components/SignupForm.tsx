@@ -101,7 +101,7 @@ export default function SignupForm() {
       const res = await fetch("/api/v1/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(result.data),
+        body: JSON.stringify({ ...result.data, creator_ref: typeof window !== "undefined" ? localStorage.getItem("creator_ref") : null }),
       });
       const data = await res.json();
       if (!res.ok) {
