@@ -1,4 +1,4 @@
-const CACHE_NAME = "nextaaroh-v1";
+const CACHE_NAME = "nextaaroh-v2";
 const OFFLINE_URL = "/offline.html";
 const PRECACHE_ASSETS = ["/", OFFLINE_URL, "/brand/logo-64.png", "/manifest.json"];
 
