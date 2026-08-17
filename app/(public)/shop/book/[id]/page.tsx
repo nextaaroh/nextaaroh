@@ -97,6 +97,10 @@ export default function BookDetailPage() {
       setMessage("सारी details भरना ज़रूरी है");
       return;
     }
+    if (!book) {
+      setMessage("Book details नहीं मिलीं");
+      return;
+    }
     setSubmitting(true);
     try {
       const res = await fetch("/api/v1/shop/orders", {
