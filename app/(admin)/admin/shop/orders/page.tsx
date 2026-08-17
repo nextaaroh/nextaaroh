@@ -89,6 +89,13 @@ export default function AdminShopOrdersPage() {
                   {marking === o.id ? "Processing..." : "Meesho खोलो & Order Mark करो"}
                 </button>
               ) : null}
+              <a
+                href={`https://wa.me/91${o.buyer_phone.replace(/[^0-9]/g, "")}?text=${encodeURIComponent(`नमस्ते ${o.buyer_name}, आपका order (${o.books?.title}) ₹${(o.final_price_paise / 100).toFixed(0)} confirm हो गया है। Address: ${o.house_no}, ${o.road_area}, ${o.city}, ${o.state} - ${o.pincode}`)}`}
+                target="_blank"
+                className="w-full mt-2 border border-green-500 text-green-600 text-sm font-medium py-2 rounded-lg text-center block"
+              >
+                WhatsApp पर Message भेजो
+              </a>
             </div>
           );
         })}

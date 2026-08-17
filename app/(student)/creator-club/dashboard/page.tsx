@@ -1,166 +1,131 @@
 "use client";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
-type Link = {
-  link_type?: string;
-  book_id?: string | null;
-  books?: { title: string; commission_percent: number } | null;
-  id: string;
-  ref_code: string;
-  video_label: string | null;
-  click_count: number;
-  signup_count: number;
+type Summary = {
+  pending_paise: number;
+  claimable_paise: number;
+  claimed_paise: number;
+  total_books_sold: number;
+  milestones: { count: number; reward: string; achieved: boolean; status: string }[];
 };
 
-export default function CreatorDashboardPage() {
-  const [links, setLinks] = useState<Link[]>([]);
-  const [label, setLabel] = useState("");
-  const [linkType, setLinkType] = useState("signup");
-  const [selectedBook, setSelectedBook] = useState("");
-  const [books, setBooks] = useState<{ id: string; title: string }[]>([]);
-  const [creating, setCreating] = useState(false);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
-  const [payoutMessage, setPayoutMessage] = useState<Record<string, string>>({});
+export default function CreatorMainDashboard() {
+  const [summary, setSummary] = useState<Summary | null>(null);
+  const [claiming, setClaiming] = useState(false);
+  const [message, setMessage] = useState("");
 
-  async function loadLinks() {
-    const res = await fetch("/api/v1/creator-club/links");
+  async function loadSummary() {
+    const res = await fetch("/api/v1/creator-club/summary");
     const data = await res.json();
-    if (res.ok) setLinks(data.data ?? []);
+    if (res.ok) setSummary(data);
   }
 
   useEffect(() => {
-    fetch("/api/v1/shop/books")
-      .then((res) => res.json())
-      .then((data) => setBooks((data.data ?? []).map((b: { id: string; title: string }) => ({ id: b.id, title: b.title }))));
+    loadSummary();
   }, []);
 
-  useEffect(() => {
-    loadLinks();
-  }, []);
-
-  async function handleCreate() {
-    setCreating(true);
-    await fetch("/api/v1/creator-club/links", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ video_label: label, link_type: linkType, book_id: linkType === "book" ? selectedBook : null }),
-    });
-    setLabel("");
-    setCreating(false);
-    loadLinks();
-  }
-
-  async function handleCopy(link: Link) {
-    const url = `${window.location.origin}/go/${link.ref_code}`;
-    await navigator.clipboard.writeText(url);
-    setCopiedId(link.id);
-    setTimeout(() => setCopiedId(null), 2000);
-  }
-
-  async function handlePayoutRequest(link: Link) {
-    const res = await fetch("/api/v1/creator-club/payout-request", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ link_id: link.id }),
-    });
+  async function handleClaim() {
+    setClaiming(true);
+    setMessage("");
+    const res = await fetch("/api/v1/creator-club/claim-wallet", { method: "POST" });
     const data = await res.json();
-    setPayoutMessage((prev) => ({
-      ...prev,
-      [link.id]: res.ok ? `✓ Request sent (₹${(data.amount_paise / 100).toFixed(0)})` : data.error?.message,
-    }));
+    if (res.ok) {
+      setMessage(`✓ ₹${(data.amount_paise / 100).toFixed(0)} wallet में भेज दिया गया`);
+      loadSummary();
+    } else {
+      setMessage(data.error?.message ?? "कुछ गलत हो गया");
+    }
+    setClaiming(false);
   }
+
+  if (!summary) return <div className="max-w-md mx-auto p-4 text-sm text-gray-500">Loading...</div>;
 
   return (
     <div className="max-w-md mx-auto p-4">
       <h1 className="text-lg font-bold mb-1">Creator Dashboard</h1>
-      <p className="text-sm text-gray-500 mb-4">Create your video links and track them</p>
+      <p className="text-sm text-gray-500 mb-4">आपकी पूरी earning यहाँ एक जगह</p>
 
-      <div className="bg-green-50 border border-green-100 rounded-xl p-3 mb-6 text-xs">
-        <p className="font-semibold mb-1">Payout Levels (Signup Links)</p>
-        <div className="grid grid-cols-2 gap-1 text-gray-600">
-          <span>20+ signups</span><span className="text-right">₹200</span>
-          <span>40+ signups</span><span className="text-right">₹350</span>
-          <span>50+ signups</span><span className="text-right">₹400</span>
-          <span>100+ signups</span><span className="text-right">₹599</span>
+      <div className="grid grid-cols-2 gap-3 mb-4">
+        <div className="bg-orange-50 border border-orange-100 rounded-xl p-3 text-center">
+          <p className="text-xs text-orange-600">Pending</p>
+          <p className="text-lg font-bold">₹{(summary.pending_paise / 100).toFixed(0)}</p>
+          <p className="text-[10px] text-gray-400">30 दिन बाद unlock</p>
         </div>
+        <div className="bg-green-50 border border-green-100 rounded-xl p-3 text-center">
+          <p className="text-xs text-green-600">Tracked (Claimable)</p>
+          <p className="text-lg font-bold">₹{(summary.claimable_paise / 100).toFixed(0)}</p>
+        </div>
+      </div>
+
+      {summary.claimable_paise > 0 ? (
+        <button
+          type="button"
+          onClick={handleClaim}
+          disabled={claiming}
+          className="w-full bg-purple-700 text-white font-semibold py-3 rounded-lg mb-2 disabled:opacity-50"
+        >
+          {claiming ? "Sending..." : `NextAaroh Wallet में भेजो (₹${(summary.claimable_paise / 100).toFixed(0)})`}
+        </button>
+      ) : null}
+      {message ? <p className="text-xs text-center text-orange-600 mb-4">{message}</p> : null}
+
+      <p className="text-xs text-gray-400 mb-6">
+        कुल claim किया हुआ: ₹{(summary.claimed_paise / 100).toFixed(0)} (यह पैसा NextAaroh Wallet में जा चुका है, वहाँ से आप UPI/Bank में withdraw कर सकते हो)
+      </p>
+
+      <div className="grid grid-cols-2 gap-3 mb-6">
+        <Link href="/creator-club/dashboard/signup" className="bg-orange-500 text-white rounded-xl p-4 text-center shadow-md active:scale-95 transition-transform">
+          <p className="text-2xl mb-1">👤</p>
+          <p className="text-sm font-semibold">Signup Links</p>
+          <p className="text-[10px] text-white/80">NextAaroh promote करो</p>
+        </Link>
+        <Link href="/creator-club/dashboard/books" className="bg-purple-700 text-white rounded-xl p-4 text-center shadow-md active:scale-95 transition-transform">
+          <p className="text-2xl mb-1">📚</p>
+          <p className="text-sm font-semibold">Book Links</p>
+          <p className="text-[10px] text-white/80">Books promote करो</p>
+        </Link>
       </div>
 
       <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6">
-        <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-2" value={linkType} onChange={(e) => setLinkType(e.target.value)}>
-          <option value="signup">NextAaroh Signup Link</option>
-          <option value="book">Book Promote Link</option>
-        </select>
-        {linkType === "book" ? (
-          <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm mb-2" value={selectedBook} onChange={(e) => setSelectedBook(e.target.value)}>
-            <option value="">-- Select Book --</option>
-            {books.map((b) => (
-              <option key={b.id} value={b.id}>{b.title}</option>
-            ))}
-          </select>
-        ) : null}
-        <label className="text-xs text-gray-500 block mb-1">Video Label (for your reference only)</label>
-        <div className="flex gap-2">
-          <input className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="e.g. Video 1 - Earn Money" value={label} onChange={(e) => setLabel(e.target.value)} />
-          <button type="button" onClick={handleCreate} disabled={creating} className="bg-orange-500 text-white text-sm font-medium px-4 rounded-lg disabled:opacity-50">
-            {creating ? "..." : "New Link"}
-          </button>
+        <p className="text-sm font-bold mb-2">🎁 Reward Milestones (कुल Books बेचे)</p>
+        <p className="text-xs text-gray-500 mb-3">अभी तक: {summary.total_books_sold} books becha (सभी book links मिलाकर)</p>
+        <div className="space-y-2">
+          {summary.milestones.map((m) => {
+            return (
+              <div key={m.count} className={`flex justify-between items-center text-xs p-2 rounded-lg ${m.achieved ? "bg-green-50" : "bg-gray-50"}`}>
+                <div>
+                  <p className="font-medium">{m.count}+ Books</p>
+                  <p className="text-gray-500">{m.reward}</p>
+                </div>
+                <span className={`px-2 py-1 rounded-full text-[10px] ${
+                  m.status === "sent" ? "bg-green-500 text-white" :
+                  m.achieved ? "bg-orange-100 text-orange-600" : "bg-gray-200 text-gray-400"
+                }`}>
+                  {m.status === "sent" ? "भेज दिया" : m.achieved ? "Pending से भेजा जाएगा" : "अभी बाकी"}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      <div className="space-y-3">
-        {links.map((link) => {
-          if (link.link_type === "book") {
-            return (
-              <div key={link.id} className="bg-white border border-gray-200 rounded-xl p-4">
-                <p className="text-sm font-medium">{link.video_label || link.books?.title || "Untitled Link"}</p>
-                <p className="text-xs text-blue-500">📚 Book: {link.books?.title}</p>
-                <p className="text-xs text-gray-400 font-mono">/go/{link.ref_code}</p>
-                <div className="flex justify-between text-xs text-gray-500 mt-2">
-                  <span>👆 {link.click_count} clicks</span>
-                  <span>🛒 {link.signup_count} orders</span>
-                  <span className="text-green-600 font-medium">{link.books?.commission_percent}% commission</span>
-                </div>
-                <button type="button" onClick={() => handleCopy(link)} className="w-full mt-3 border border-orange-400 text-orange-600 text-xs font-medium py-2 rounded-lg">
-                  {copiedId === link.id ? "✓ Copied!" : "Copy Link"}
-                </button>
-                <p className="text-xs text-gray-400 mt-2">Commission adds to wallet automatically (after 30 days)</p>
-              </div>
-            );
-          }
-          const slabInfo =
-            link.signup_count >= 100 ? "₹599" :
-            link.signup_count >= 50 ? "₹400" :
-            link.signup_count >= 40 ? "₹350" :
-            link.signup_count >= 20 ? "₹200" : "20+ signups needed";
-          return (
-            <div key={link.id} className="bg-white border border-gray-200 rounded-xl p-4">
-              <p className="text-sm font-medium">{link.video_label || "Untitled Link"}</p>
-              <p className="text-xs text-gray-400 font-mono">/go/{link.ref_code}</p>
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
-                <span>👆 {link.click_count} clicks</span>
-                <span>👤 {link.signup_count} signups</span>
-                <span className="text-green-600 font-medium">{slabInfo}</span>
-              </div>
-              <div className="flex gap-2 mt-3">
-                <button type="button" onClick={() => handleCopy(link)} className="flex-1 border border-orange-400 text-orange-600 text-xs font-medium py-2 rounded-lg">
-                  {copiedId === link.id ? "✓ Copied!" : "Copy Link"}
-                </button>
-                {link.signup_count >= 20 ? (
-                  <button type="button" onClick={() => handlePayoutRequest(link)} className="flex-1 bg-green-500 text-white text-xs font-medium py-2 rounded-lg">
-                    Payout Request
-                  </button>
-                ) : null}
-              </div>
-              {link.signup_count < 20 ? (
-                <p className="text-xs text-orange-600 mt-2">
-                  {20 - link.signup_count} more signups needed for payout (₹200 at 20)
-                </p>
-              ) : null}
-              {payoutMessage[link.id] ? <p className="text-xs text-orange-600 mt-2">{payoutMessage[link.id]}</p> : null}
-            </div>
-          );
-        })}
+      <div className="bg-blue-50 border border-blue-100 rounded-xl p-4 mb-6 text-xs text-gray-600 space-y-2">
+        <p className="font-bold text-sm text-gray-800">💰 पैसा कैसे मिलेगा</p>
+        <p>1. Signup Links या Book Links से जो कमाई होती है, वो पहले <strong>Pending</strong> में दिखती है।</p>
+        <p>2. Book commission 30 दिन बाद अपने आप <strong>Tracked/Claimable</strong> हो जाता है (यह return window की वजह से है)। Signup link payout NextAaroh Team verify करने के बाद turant claimable हो जाता है।</p>
+        <p>3. आप ऊपर वाला बटन दबाकर पैसा <strong>NextAaroh Wallet</strong> में भेज सकते हो।</p>
+        <p>4. Wallet से आप UPI या Bank account में withdraw कर सकते हो (Profile → Wallet section में जाकर)।</p>
       </div>
+
+      <details className="bg-gray-50 rounded-xl p-4 text-xs text-gray-500">
+        <summary className="font-bold text-gray-700 cursor-pointer">Terms & Conditions</summary>
+        <ul className="mt-2 space-y-1 list-disc pl-4">
+          <li>Fake clicks, bots, या fraud तरीके से signups/orders लाने पर account block हो सकता है।</li>
+          <li>Reward (T-shirt/shoes/cash) भेजने में समय लग सकता है, NextAaroh team आपसे delivery details के लिए संपर्क करेगी।</li>
+          <li>Commission की राशि admin verification के बाद ही final मानी जाएगी।</li>
+        </ul>
+      </details>
     </div>
   );
 }

@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(req: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
   const body = await req.json();
   const {
     book_id,
@@ -40,6 +44,7 @@ export async function POST(req: NextRequest) {
     discount_paise: discount_paise ?? 0,
     final_price_paise,
     status: "pending",
+    buyer_user_id: user?.id ?? null,
   });
 
   if (error) {

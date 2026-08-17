@@ -25,6 +25,7 @@ const QUICK_LINKS = [
   { href: "/admin/shop/promo", label: "Shop — Promo Codes", emoji: "🎟️" },
   { href: "/admin/creator-club/applications", label: "Creator Club Applications", emoji: "🎥" },
   { href: "/admin/creator-club/payouts", label: "Creator Payouts", emoji: "💰" },
+  { href: "/admin/creator-club/rewards", label: "Creator Rewards", emoji: "🎁" },
   { href: "/admin/opportunities/pending", label: "Opportunity Approvals", emoji: "🎯" },
   { href: "/admin/learning", label: "Learning Videos", emoji: "🎬" },
   { href: "/admin/quiz", label: "Quiz Manager", emoji: "📝" },
