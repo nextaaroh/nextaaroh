@@ -43,7 +43,7 @@ export default function Header() {
               📲 Install
             </button>
           ) : null}
-          <Link href="/scholarships">Scholarships</Link>
+          <Link href="/digital-products">Digital Products</Link>
           <Link href="/website-service">Website Services</Link>
           <Link href="/me" className="flex items-center gap-1.5">
             {loggedIn && photoUrl ? (

@@ -3,6 +3,18 @@ import { useEffect, useState, useCallback } from "react";
 
 type Video = { id: string; title: string; youtube_url: string; thumbnail_url: string; category: string | null };
 
+type Skill = { id: string; name: string; slug: string; category: string; emoji: string | null };
+
+const SKILL_CATEGORIES = [
+  { value: "ai", label: "🤖 AI Skills" },
+  { value: "career", label: "💼 Career Skills" },
+  { value: "communication", label: "🗣️ Communication Skills" },
+  { value: "digital", label: "💻 Digital Skills" },
+  { value: "business", label: "📈 Business Skills" },
+  { value: "creative", label: "🎨 Creative Skills" },
+  { value: "sports", label: "🏅 Sports Education" },
+];
+
 const CATEGORIES = [
   { value: "skills_learning", label: "Skills Learning Classes" },
   { value: "sports_learning", label: "Sports Learning Classes" },
@@ -17,12 +29,56 @@ export default function AdminLearningPage() {
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
 
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [skillName, setSkillName] = useState("");
+  const [skillCategory, setSkillCategory] = useState(SKILL_CATEGORIES[0].value);
+  const [skillEmoji, setSkillEmoji] = useState("");
+  const [skillSubmitting, setSkillSubmitting] = useState(false);
+  const [skillMessage, setSkillMessage] = useState("");
+
   const load = useCallback(() => {
     fetch("/api/v1/admin/learning/videos")
       .then((res) => (res.ok ? res.json() : { data: [] }))
       .then((data) => setVideos(data?.data ?? []))
       .catch(() => setVideos([]));
   }, []);
+
+  const loadSkills = useCallback(() => {
+    fetch("/api/v1/admin/skills")
+      .then((res) => (res.ok ? res.json() : { data: [] }))
+      .then((data) => setSkills(data?.data ?? []))
+      .catch(() => setSkills([]));
+  }, []);
+
+  useEffect(() => {
+    loadSkills();
+  }, [loadSkills]);
+
+  async function handleAddSkill() {
+    setSkillMessage("");
+    if (!skillName.trim()) {
+      setSkillMessage("Skill name ज़रूरी है");
+      return;
+    }
+    setSkillSubmitting(true);
+    try {
+      const res = await fetch("/api/v1/admin/skills", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: skillName, category: skillCategory, emoji: skillEmoji }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setSkillMessage(data.error?.message ?? "कुछ गलत हो गया");
+        return;
+      }
+      setSkillName("");
+      setSkillEmoji("");
+      loadSkills();
+    } finally {
+      setSkillSubmitting(false);
+    }
+  }
 
   useEffect(() => {
     load();
@@ -56,6 +112,37 @@ export default function AdminLearningPage() {
 
   return (
     <div>
+      <h1 className="text-lg font-bold mb-4">Skills</h1>
+
+      <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6 max-w-md">
+        <p className="text-sm font-medium mb-3">नया Skill जोड़ें</p>
+        <div className="space-y-2">
+          <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Skill Name (e.g. Public Speaking)" value={skillName} onChange={(e) => setSkillName(e.target.value)} />
+          <input className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" placeholder="Emoji (optional, e.g. 🗣️)" value={skillEmoji} onChange={(e) => setSkillEmoji(e.target.value)} />
+          <select className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm" value={skillCategory} onChange={(e) => setSkillCategory(e.target.value)}>
+            {SKILL_CATEGORIES.map((c) => {
+              return <option key={c.value} value={c.value}>{c.label}</option>;
+            })}
+          </select>
+          {skillMessage ? <p className="text-red-600 text-xs">{skillMessage}</p> : null}
+          <button type="button" onClick={handleAddSkill} disabled={skillSubmitting} className="w-full bg-purple-700 text-white text-sm font-medium py-2 rounded-lg disabled:opacity-50">
+            {skillSubmitting ? "Adding..." : "Add Skill"}
+          </button>
+        </div>
+      </div>
+
+      <p className="text-sm font-medium mb-2">सारे Skills ({skills.length})</p>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-2 mb-8 max-w-2xl">
+        {skills.map((s) => {
+          return (
+            <div key={s.id} className="border border-gray-200 bg-white rounded-lg px-3 py-2 text-sm flex justify-between">
+              <span>{s.emoji} {s.name}</span>
+              <span className="text-xs text-gray-400">{s.category}</span>
+            </div>
+          );
+        })}
+      </div>
+
       <h1 className="text-lg font-bold mb-4">Learning Videos</h1>
 
       <div className="bg-white border border-gray-200 rounded-xl p-4 mb-6 max-w-md">

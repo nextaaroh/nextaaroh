@@ -3,7 +3,7 @@ import Link from "next/link";
 const actions = [
   { href: "/quiz", label: "Take Quiz", emoji: "📝" },
   { href: "/marketplace/sell", label: "Sell Notes", emoji: "🛍️" },
-  { href: "/ai-coach", label: "AI Coach", emoji: "✨" },
+  { href: "/digital-products", label: "Digital Products", emoji: "🛒" },
 ];
 
 export default function QuickActions() {

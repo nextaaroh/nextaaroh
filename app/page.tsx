@@ -5,7 +5,6 @@ import SessionBanner from "@/components/SessionBanner";
 import ChatManagerCard from "@/components/ChatManagerCard";
 import WebsiteServiceBanner from "@/components/WebsiteServiceBanner";
 import ContinueLearning from "@/components/ContinueLearning";
-import AiCoachBanner from "@/components/AiCoachBanner";
 import HomeAdSection from "@/components/HomeAdSection";
 import DailyQuoteCard from "@/features/daily-content/components/DailyQuoteCard";
 import DailyLearningCard from "@/features/daily-content/components/DailyLearningCard";
@@ -13,7 +12,6 @@ import FeaturedOpportunitiesCarousel from "@/features/featured-opportunities/com
 import TopWebsitesList from "@/features/daily-content/components/TopWebsitesList";
 import DreamWallPreview from "@/features/dream-wall/components/DreamWallPreview";
 import SocialChannels from "@/features/social/components/SocialChannels";
-import HelpWidget from "@/features/ai-coach/components/HelpWidget";
 
 export default function HomePage() {
   return (
@@ -25,7 +23,6 @@ export default function HomePage() {
       <ChatManagerCard />
       <WebsiteServiceBanner />
       <ContinueLearning />
-      <AiCoachBanner />
       <HomeAdSection />
       <DailyQuoteCard />
       <DailyLearningCard />
@@ -33,7 +30,6 @@ export default function HomePage() {
       <TopWebsitesList />
       <DreamWallPreview />
       <SocialChannels />
-      <HelpWidget />
     </div>
   );
 }

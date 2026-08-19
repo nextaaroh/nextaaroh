@@ -1,9 +1,7 @@
 import Link from "next/link";
 
 const LINKS = [
-  { href: "/blog", label: "Blog", emoji: "📰" },
-  { href: "/scholarships", label: "Scholarships", emoji: "🎓" },
-  { href: "/workplace", label: "Workplace", emoji: "💼" },
+  { href: "/digital-products", label: "Digital Products", emoji: "🛒" },
   { href: "/website-service", label: "Get Website", emoji: "🌐" },
 ];
 
