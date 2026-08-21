@@ -35,7 +35,7 @@ export default function LoginForm() {
         return;
       }
       if (data.educator_welcome) alert(data.educator_welcome);
-      window.location.href = "/dashboard";
+      window.location.href = "/me";
     } catch {
       setError(t("login.network_error"));
       setSubmitting(false);

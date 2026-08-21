@@ -27,10 +27,15 @@ export default function HomeHero() {
       </p>
 
       {loggedIn === false ? (
-        <div className="flex gap-3 justify-center flex-wrap">
-          <Link href="/learning" className="inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-full">Explore Skills</Link>
-          <Link href="/opportunities" className="inline-block border border-white/30 text-white font-semibold px-6 py-3 rounded-full">Find Opportunities</Link>
-        </div>
+        <>
+          <Link href="/signup" className="inline-block bg-orange-500 text-white font-semibold px-8 py-3 rounded-full mb-3">
+            मुफ़्त में शुरू करें
+          </Link>
+          <div className="flex gap-3 justify-center flex-wrap">
+            <Link href="/learning" className="inline-block bg-orange-500 text-white font-semibold px-6 py-3 rounded-full">Explore Skills</Link>
+            <Link href="/opportunities" className="inline-block border border-white/30 text-white font-semibold px-6 py-3 rounded-full">Find Opportunities</Link>
+          </div>
+        </>
       ) : null}
 
       {loggedIn === true ? (

@@ -110,7 +110,7 @@ export default function SignupForm() {
         return;
       }
       if (data.educator_welcome) alert(data.educator_welcome);
-      window.location.href = "/dashboard";
+      window.location.href = "/me";
     } catch {
       setServerError(t("signup.network_error"));
       setSubmitting(false);
